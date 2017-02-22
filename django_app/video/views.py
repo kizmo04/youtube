@@ -5,7 +5,6 @@ from dateutil.parser import parse
 from django.shortcuts import render
 
 from utils.settings import get_config
-from .forms import SearchForm
 
 
 def get_item_from_youtube(query, max_results=10, page_token=None):
@@ -33,8 +32,8 @@ def get_item_from_youtube(query, max_results=10, page_token=None):
 def get_context(result_dict):
     # 5. 이후 내부에 있는 검색결과를 적절히 루프하며 프린트 해주기
     items = result_dict['items']
-    next_page_token = result_dict.get('nextPageToken')
-    prev_page_token = result_dict.get('prevPageToken')
+    next_page_token = result_dict.get('nextPageToken', '')
+    prev_page_token = result_dict.get('prevPageToken', '')
     video_list = []
     for index, item in enumerate(items):
         video_id = item['id']['videoId']
@@ -63,7 +62,6 @@ def get_context(result_dict):
         'prev_page_token': prev_page_token,
         'next_page_token': next_page_token,
         'video_list': video_list
-
     }
     return context
 
@@ -73,54 +71,13 @@ def search(request):
     context = {
         'video_list': video_list
     }
+    query = request.GET.get('query', '').strip()
+    max_results = request.GET.get('max_results')
+    page_token = request.GET.get('page_token')
 
-    if request.GET.get('query', '').strip() != '':
-        form = SearchForm(request.GET)
-        if form.is_valid():
-            query = form.cleaned_data['query']
-            max_results = form.cleaned_data['max_results']
-            video_list = get_and_save_item_from_youtube(query, max_results)[0]
-
-            context = {
-                'video_list': video_list,
-                'form': form
-            }
-            return render(request, 'video/search.html', context)
-
+    if query != '':
+        context = get_context(get_item_from_youtube(query, max_results, page_token))
+        context['query'] = query
+        context['max_results'] = max_results
     # video_list = get_and_save_item_from_youtube(query, max_results)
-    form = SearchForm()
-    context = {
-
-        'form': form
-    }
-    return render(request, 'video/search.html', context)
-
-
-def prev_page_view(request):
-    max_results = request.GET.get('max_result')
-    query = request.GET.get('query')
-    prev_page_token = get_and_save_item_from_youtube(query, max_results)[2]
-
-    video_list = get_and_save_item_from_youtube(query, max_results, prev_page_token)[0]
-    form = SearchForm()
-
-    context = {
-        'video_list': video_list,
-        'form': form
-    }
-    return render(request, 'video/search.html', context)
-
-
-def next_page_view(request):
-    max_results = request.GET.get('max_result')
-    query = request.GET.get('query')
-    next_page_token = get_and_save_item_from_youtube(query, max_results)[1]
-
-    video_list = get_and_save_item_from_youtube(query, max_results, next_page_token)[0]
-    form = SearchForm()
-
-    context = {
-        'video_list': video_list,
-        'form': form
-    }
     return render(request, 'video/search.html', context)

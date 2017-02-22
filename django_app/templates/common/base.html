@@ -21,18 +21,28 @@
           <a href="" class="logo sprite-logo"></a>
         </span>
             <span class="nav-group nav-center">
-            <form action="{% url 'video:search' %}" method="get">
-                {{ form }}
-            <button type="submit">검색</button>
+            <form action="" method="get">
+                <input type="text" name="query">
+                <input type="number" name="max_results">
+                <button type="submit">검색</button>
             </form>
                 {{ video_list.count }}개의 결과
-             <form action="">
-                 <input type="hidden" name="query" value="{{ video.query }}">
-                 <input type="hidden" name="max_resuts" value="">
-                 <input type="hidden" name="page_token" value="{{ video.next_page_token }}">
-                 <button type="submit">다음</button>
-             </form>
-
+                {% if prev_page_token %}
+                    <form action="">
+                         <input type="hidden" name="query" value="{{ query }}">
+                         <input type="hidden" name="max_results" value="{{ max_results }}">
+                         <input type="hidden" name="page_token" value="{{ prev_page_token }}">
+                         <button type="submit">이전</button>
+                    </form>
+                {% endif %}
+                {% if next_page_token %}
+                    <form action="">
+                         <input type="hidden" name="query" value="{{ query }}">
+                         <input type="hidden" name="max_results" value="{{ max_results }}">
+                         <input type="hidden" name="page_token" value="{{ next_page_token }}">
+                         <button type="submit">다음</button>
+                     </form>
+                {% endif %}
         </span>
             <span class="nav-group nav-right">
           <a href="" class="btn-header-nav sprite-explore"></a>
