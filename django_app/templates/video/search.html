@@ -1,0 +1,71 @@
+{% extends 'common/base.html' %}
+{% block content %}
+    <div class="post-list-container">
+        {% for video in video_list %}
+            <article class="post">
+                <header class="post-header">
+                    <span class="header-username"><img src="{{ video.thumbnail }}" height="50px" width="50px" alt=""></span>
+                    <span class="header-date"></span>
+
+                    <span class="header-delete inline-block">
+        <form action="" method="POST">{% csrf_token %}
+          <button type="submit">Delete Post</button>
+        </form>
+      </span>
+                </header>
+
+                <div class="post-image-container">
+                    <a href="">
+                        <iframe class="post-image" width="560" height="315"
+                                src="https://www.youtube.com/embed/{{ video.video_id }}" frameborder="0"
+                                allowfullscreen></iframe>
+                    </a>
+                </div>
+                <div class="post-bottom-container">
+                    <div class="post-like-users">
+                        {{ video.title }}
+
+                    </div>
+                    <div class="post-content">{{ video.description|linebreaksbr|truncatechars:100 }}</div>
+                    <div class="post-comments">
+                        <div class="post-comment">
+                            <span class="comment-author">{{ video.published_date }}</span>
+                            <span class="comment-content"></span>
+                            <span class="comment-delete inline-block">
+            <form action=""
+                  method="POST">{% csrf_token %}
+              <button type="submit">X</button>
+            </form>
+          </span>
+
+                        </div>
+
+                    </div>
+                    <div class="post-comment-form-container clearfix">
+                        <form action="" method="POST"
+                              class="form-like">{% csrf_token %}
+
+                            <button type="submit" class="btn-like sprite-heart-full"></button>
+
+                            <button type="submit" class="btn-like sprite-heart-empty"></button>
+
+                            </button>
+                        </form>
+
+                        <form action="" method="POST"
+                              class="form-comment">{% csrf_token %}
+                            <input
+                                    type="text"
+                                    placeholder="댓글 달기..."
+                                    class="input-comment"
+                                    name="content">
+                        </form>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+
+        <a href="" class="btn-add-post">+ Add Post</a>
+    </div>
+
+{% endblock %}
