@@ -2,6 +2,7 @@ import json
 
 import requests
 from dateutil.parser import parse
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, redirect
 
 from utils.settings import get_config
@@ -112,6 +113,20 @@ def video_bookmark_toggle(request):
         description = request.POST.get('description')
         video_id = video_id
         video, _ = Video.objects.get_or_create(youtube_video_id=video_id, title=title, description=description,
-                                     is_bookmarked=True)
+                                               is_bookmarked=True)
         video.videobookmark_set.create(user=user)
     return redirect(prev_path)
+
+
+def bookmark_list(request):
+    if __name__ == '__main__':
+        all_bookmarks = request.user.videobookmark_set.select_related('video')
+        paginator = Paginator(all_bookmarks, 5)
+        page = request.GET.get('page')
+        try:
+            bookmarks = paginator.page(page)
+        except PageNotAnInteger:
+            bookmarks = paginator.page(1)
+        except EmptyPage:
+            bookmarks = paginator.page(paginator.num_pages)
+        return render(request, 'video/bookmark_list.html', {'bookmarks': bookmarks})
