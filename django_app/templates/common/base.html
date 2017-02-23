@@ -26,7 +26,7 @@
                 <input type="number" name="max_results">
                 <button type="submit">검색</button>
             </form>
-                {{ video_list.count }}개의 결과
+                {{ total_results }}개의 결과
                 {% if prev_page_token %}
                     <form action="">
                          <input type="hidden" name="query" value="{{ query }}">

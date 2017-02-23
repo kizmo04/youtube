@@ -4,7 +4,8 @@
         {% for video in video_list %}
             <article class="post">
                 <header class="post-header">
-                    <span class="header-username"><img src="{{ video.thumbnail }}" height="50px" width="50px" alt=""></span>
+                    <span class="header-username"><img src="{{ video.thumbnail }}" height="50px" width="50px"
+                                                       alt=""></span>
                     <span class="header-date"></span>
 
                     <span class="header-delete inline-block">
@@ -42,14 +43,21 @@
 
                     </div>
                     <div class="post-comment-form-container clearfix">
-                        <form action="" method="POST"
+                        <form action="{% url 'video:bookmark_toggle' %}" method="POST"
                               class="form-like">{% csrf_token %}
+                            <input type="hidden" name="query" value="{{ query }}">
+                            <input type="hidden" name="max_results" value="{{ max_results }}">
+                            <input type="hidden" name="page_token" value="{{ page_token }}">
+                            <input type="hidden" name="video_id" value="{{ video.video_id }}">
+                            <input type="hidden" name="title" value="{{ video.title }}">
+                            <input type="hidden" name="description" value="{{ video.description }}">
+                            <input type="hidden" name="path" value="{{ request.get_full_path }}">
 
-                            <button type="submit" class="btn-like sprite-heart-full"></button>
-
-                            <button type="submit" class="btn-like sprite-heart-empty"></button>
-
-                            </button>
+                            {% if video.is_bookmarked %}
+                                <button type="submit" class="btn-like sprite-heart-full"></button>
+                            {% else %}
+                                <button type="submit" class="btn-like sprite-heart-empty"></button>
+                            {% endif %}
                         </form>
 
                         <form action="" method="POST"
