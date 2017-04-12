@@ -13,9 +13,10 @@ class Video(models.Model):
         return 'Video id:[{}], title[{}]'.format(self.id, self.title)
 
 
+# 중간자모델
 class VideoBookmark(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    video = models.ForeignKey(Video)
+    video = models.ForeignKey('video.Video')
     bookmarked_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:

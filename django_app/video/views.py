@@ -2,6 +2,7 @@ import json
 
 import requests
 from dateutil.parser import parse
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import render, redirect
 
@@ -101,23 +102,33 @@ def bookmark_list(request):
     return render(request, 'video/bookmark.html')
 
 
+@login_required
 def video_bookmark_toggle(request):
-    video_id = request.POST.get('video_id')
-    prev_path = request.POST['path']
-    if VideoBookmark.objects.filter(video__youtube_video_id=video_id, user=request.user).exists():
-        VideoBookmark.objects.get(video__youtube_video_id=video_id, user=request.user).delete()
+    if request.method == 'POST':
+        video_id = request.POST.get('video_id')
+        prev_path = request.POST['path']
+        if VideoBookmark.objects.filter(video__youtube_video_id=video_id, user=request.user).exists():
+            VideoBookmark.objects.get(video__youtube_video_id=video_id, user=request.user).delete()
 
-    else:
-        user = request.user
-        title = request.POST.get('title')
-        description = request.POST.get('description')
-        video_id = video_id
-        video, _ = Video.objects.get_or_create(youtube_video_id=video_id, title=title, description=description,
-                                               is_bookmarked=True)
-        video.videobookmark_set.create(user=user)
+        else:
+            user = request.user
+            title = request.POST.get('title')
+            description = request.POST.get('description')
+            video_id = video_id
+            defaults = {
+                'title': title,
+                'description': description,
+                'is_bookmarked': True
+            }
+            video, _ = Video.objects.get_or_create(
+                youtube_video_id=video_id,
+                defaults=defaults
+                )
+            video.videobookmark_set.create(user=user)
     return redirect(prev_path)
 
 
+@login_required
 def bookmark_list(request):
     if __name__ == '__main__':
         all_bookmarks = request.user.videobookmark_set.select_related('video')
